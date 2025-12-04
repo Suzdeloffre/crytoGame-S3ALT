@@ -1,0 +1,27 @@
+# Version simplifiée - Ignore tout sauf Assets, ProjectSettings, Packages
+
+# Dossiers Unity à ignorer
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emory[Cc]aptures/
+
+# Fichiers Visual Studio / Rider
+*.csproj
+*.sln
+*.suo
+*.user
+.vs/
+.vscode/
+.idea/
+
+# Fichiers OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Tout le reste (Assets, ProjectSettings, Packages) sera inclus automatiquement
