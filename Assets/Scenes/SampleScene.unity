@@ -955,7 +955,7 @@ MonoBehaviour:
   hostButton: {fileID: 505843809}
   serverButton: {fileID: 1350720865}
   clientButton: {fileID: 1499888205}
-  connectionPanel: {fileID: 0}
+  connectionPanel: {fileID: 756099552}
 --- !u!114 &756099554
 MonoBehaviour:
   m_ObjectHideFlags: 0
