@@ -63,6 +63,7 @@ public class DropDownManager : MonoBehaviour, IPointerClickHandler
     public ulong GetSelectedPlayerId()
     {
         int index = playerDropdown.value;
+        Debug.Log(index);
         if (index >= 0 && index < playerIds.Count)
             return playerIds[index];
 

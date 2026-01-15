@@ -1,5 +1,6 @@
 using Unity.Entities.UniversalDelegates;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,9 @@ public class NetworkManagerUI : MonoBehaviour
     [Header("Panneau de connexion")]
     [SerializeField] private GameObject connectionPanel;
     [SerializeField] public GameObject chatPanel;
+
+    [Header("Réseau du chat")]
+    [SerializeField] public NetworkChatManager netWorkChatManager;
 
     void Awake()
     {
@@ -34,6 +38,7 @@ public class NetworkManagerUI : MonoBehaviour
     {
         Debug.Log("Démarrage en mode Host (Serveur + Client)");
         NetworkManager.Singleton.StartHost();
+        netWorkChatManager.share();
         HideConnectionPanel();
     }
 
@@ -48,6 +53,7 @@ public class NetworkManagerUI : MonoBehaviour
     {
         Debug.Log("Démarrage en mode Client");
         NetworkManager.Singleton.StartClient();
+        netWorkChatManager.share();
         HideConnectionPanel();
     }
 

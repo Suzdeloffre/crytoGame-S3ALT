@@ -69,11 +69,10 @@ public class ChatManager : MonoBehaviour
 
     if (networkManager != null)
     {
-        if (dropDownManager != null && dropDownManager.GetSelectedPlayerId() != 0)
+        if (dropDownManager != null && dropDownManager.GetSelectedPlayerId() != 99999)
         {
             // Envoi crypté à un joueur spécifique
             ulong targetId = dropDownManager.GetSelectedPlayerId();
-            Debug.Log(targetId);
             networkManager.SendEncryptedMessageToPlayer(targetId, message);
             DisplayMessage("Moi", message, true);
         }

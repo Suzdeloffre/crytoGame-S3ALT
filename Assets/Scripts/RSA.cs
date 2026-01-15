@@ -21,7 +21,7 @@ public class RSA : MonoBehaviour // ← Changé de RSAEncryption à RSA
     public void GenerateKeys()
     {
         Debug.Log("Génération des clés RSA...");
-        var cle = ChoixCle(10000, 5000); //base 100, 900
+        var cle = ChoixCle(100, 900); //base 100, 900 -> 10000 5000 for security
 
         if (cle == null)
         {
@@ -42,7 +42,7 @@ public class RSA : MonoBehaviour // ← Changé de RSAEncryption à RSA
 
         Debug.Log($"Clés générées : p={p}, q={q}, e={e}");
         Debug.Log($"Clé publique (n={clePublique.Item1}, e={clePublique.Item2})");
-        Debug.Log($"Clé Privées (n={clePrivee.Item1}, e={clePrivee.Item2})");
+        Debug.Log($"Clé Privées (n={clePrivee.Item1}, d={clePrivee.Item2})");
     }
 
     // ----- Affichage des clés -----

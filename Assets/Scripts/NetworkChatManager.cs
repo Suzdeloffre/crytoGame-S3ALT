@@ -28,6 +28,17 @@ public class NetworkChatManager : NetworkBehaviour
         }
     }
 
+    public void share()
+    {
+        
+        Debug.Log("share called" + IsClient);
+        if (!IsServer)
+        {
+            rsaEncryption.ShowKeys();
+            SharePublicKeyServerRpc(NetworkManager.Singleton.LocalClientId, rsaEncryption.PublicKeyString);
+        }
+    }
+
     // Envoie un message chat
     public void SendChatMessage(string message)
     {
@@ -85,15 +96,13 @@ public class NetworkChatManager : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     void UpdatePublicKeyClientRpc(ulong clientId, string publicKey)
     {
-        if (!playerPublicKeys.ContainsKey(clientId))
-        {
-            playerPublicKeys[clientId] = publicKey;
-            Debug.Log($"Clé publique du joueur {clientId} ajoutée : {publicKey}");
+        Debug.Log(!playerPublicKeys.ContainsKey(clientId));
+        playerPublicKeys[clientId] = publicKey;
+        Debug.Log($"Clé publique du joueur {clientId} ajoutée : {publicKey}");
             
-            if (chatManager != null)
-            {
-                chatManager.DisplaySystemMessage($"Joueur {clientId} a rejoint le chat (clé reçue)");
-            }
+        if (chatManager != null)
+        {
+            chatManager.DisplaySystemMessage($"Joueur {clientId} a rejoint le chat (clé reçue)");
         }
     }
 
