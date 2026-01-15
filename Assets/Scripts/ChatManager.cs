@@ -73,6 +73,7 @@ public class ChatManager : MonoBehaviour
         {
             // Envoi crypté à un joueur spécifique
             ulong targetId = dropDownManager.GetSelectedPlayerId();
+            Debug.Log(targetId);
             networkManager.SendEncryptedMessageToPlayer(targetId, message);
             DisplayMessage("Moi", message, true);
         }
