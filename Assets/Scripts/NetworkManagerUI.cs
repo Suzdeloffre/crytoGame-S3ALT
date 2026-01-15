@@ -1,3 +1,4 @@
+using Unity.Entities.UniversalDelegates;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,7 @@ public class NetworkManagerUI : MonoBehaviour
     
     [Header("Panneau de connexion")]
     [SerializeField] private GameObject connectionPanel;
+    [SerializeField] public GameObject chatPanel;
 
     void Awake()
     {
@@ -53,6 +55,9 @@ public class NetworkManagerUI : MonoBehaviour
     {
         if (connectionPanel != null)
             connectionPanel.SetActive(false);
+        //also show ChatPanel
+        if (chatPanel != null)
+            chatPanel.SetActive(true);
     }
 
     void OnDestroy()

@@ -29,8 +29,10 @@ public class ChatManager : MonoBehaviour
             chatPanel.SetActive(false);
         
         // Configure les boutons
-        if (toggleChatButton != null)
-            toggleChatButton.onClick.AddListener(ToggleChat);
+        //if (toggleChatButton != null)
+        //    toggleChatButton.onClick.AddListener(ToggleChat);
+        // Button already configured in ChatToggleButton.cs causing the chat to
+        // open and close instantly
         
         if (sendButton != null)
             sendButton.onClick.AddListener(SendMessage);
@@ -45,7 +47,7 @@ public class ChatManager : MonoBehaviour
     void Update()
     {
         // Ouvre/ferme le chat avec la touche T (ou autre)
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.Slash))
         {
             ToggleChat();
         }
