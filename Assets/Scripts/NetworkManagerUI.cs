@@ -52,9 +52,19 @@ public class NetworkManagerUI : MonoBehaviour
     void StartClient()
     {
         Debug.Log("Démarrage en mode Client");
+
+        if (NetworkManager.Singleton == null)
+        {
+            Debug.LogError("NetworkManager absent !");
+            return;
+        }
+
+        // Start le client
         NetworkManager.Singleton.StartClient();
-        netWorkChatManager.share();
+
+        // Cache le panel
         HideConnectionPanel();
+
     }
 
     void HideConnectionPanel()

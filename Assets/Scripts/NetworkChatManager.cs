@@ -12,8 +12,11 @@ public class NetworkChatManager : NetworkBehaviour
     
     void Start()
     {
+
         chatManager = FindFirstObjectByType<ChatManager>();
         rsaEncryption = GetComponent<RSA>(); // ← Changé de RSAEncryption à RSA
+
+        NetworkManager.OnClientConnectedCallback += OnClientConnected;
         
         if (rsaEncryption == null)
         {
@@ -29,16 +32,44 @@ public class NetworkChatManager : NetworkBehaviour
     }
 
     public void share()
-    {
-        
-        Debug.Log("share called" + IsClient);
-        if (!IsServer)
+    {        
+        Debug.Log("share called" + NetworkManager.IsClient);
+        if (NetworkManager.IsClient)
         {
             rsaEncryption.ShowKeys();
             SharePublicKeyServerRpc(NetworkManager.Singleton.LocalClientId, rsaEncryption.PublicKeyString);
         }
     }
 
+    private void OnClientConnected(ulong clientId)
+    {
+        if (clientId != NetworkManager.Singleton.LocalClientId) return;
+
+        Debug.Log("Client local connecté et prêt !");
+
+        // Vérifie que le NetworkObject est spawné avant de partager la clé
+        NetworkObject netObj = GetComponent<NetworkObject>();
+        if (netObj != null && netObj.IsSpawned)
+        {
+            share();
+        }
+        else
+        {
+            // Sinon, attendre que le NetworkObject soit spawné
+            StartCoroutine(WaitForSpawnAndShare());
+        }
+
+        NetworkManager.OnClientConnectedCallback -= OnClientConnected;
+    }
+
+    private System.Collections.IEnumerator WaitForSpawnAndShare()
+    {
+        NetworkObject netObj = GetComponent<NetworkObject>();
+        while (netObj == null || !netObj.IsSpawned)
+            yield return null;
+
+        share();
+    }
     // Envoie un message chat
     public void SendChatMessage(string message)
     {
