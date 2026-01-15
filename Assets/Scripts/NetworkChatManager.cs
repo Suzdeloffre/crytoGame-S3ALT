@@ -23,20 +23,16 @@ public class NetworkChatManager : NetworkBehaviour
             rsaEncryption = gameObject.AddComponent<RSA>(); // ← Changé
         }
         
-        // Affiche les clés générées
-        if (IsClient)
-        {
-            rsaEncryption.ShowKeys();
-            SharePublicKeyServerRpc(NetworkManager.Singleton.LocalClientId, rsaEncryption.PublicKeyString);
-        }
+        
     }
 
     public void share()
     {        
-        Debug.Log("share called" + NetworkManager.IsClient);
+        Debug.Log("share called, IsClient: " + NetworkManager.IsClient);
         if (NetworkManager.IsClient)
         {
             rsaEncryption.ShowKeys();
+            Debug.Log($"[Client {NetworkManager.Singleton.LocalClientId}] Partage clé: {rsaEncryption.PublicKeyString}");
             SharePublicKeyServerRpc(NetworkManager.Singleton.LocalClientId, rsaEncryption.PublicKeyString);
         }
     }
@@ -127,8 +123,14 @@ public class NetworkChatManager : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     void UpdatePublicKeyClientRpc(ulong clientId, string publicKey)
     {
-        Debug.Log(!playerPublicKeys.ContainsKey(clientId));
-        playerPublicKeys[clientId] = publicKey;
+        if (!playerPublicKeys.ContainsKey(clientId))
+        {
+            playerPublicKeys[clientId] = publicKey;
+        }
+        else
+        {
+            Debug.LogWarning($"Clé du joueur {clientId} déjà présente");
+        }
         Debug.Log($"Clé publique du joueur {clientId} ajoutée : {publicKey}");
             
         if (chatManager != null)
@@ -140,6 +142,8 @@ public class NetworkChatManager : NetworkBehaviour
     // Méthode pour envoyer un message chiffré à un joueur spécifique
     public void SendEncryptedMessageToPlayer(ulong targetPlayerId, string message)
     {
+        Debug.Log($"Tentative d'envoi crypté à {targetPlayerId}. Clés disponibles: {string.Join(", ", playerPublicKeys.Keys)}");
+        
         if (!playerPublicKeys.ContainsKey(targetPlayerId))
         {
             Debug.LogWarning($"Clé publique du joueur {targetPlayerId} non trouvée");
