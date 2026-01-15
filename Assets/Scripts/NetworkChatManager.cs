@@ -32,8 +32,13 @@ public class NetworkChatManager : NetworkBehaviour
         if (NetworkManager.IsClient)
         {
             rsaEncryption.ShowKeys();
-            Debug.Log($"[Client {NetworkManager.Singleton.LocalClientId}] Partage clé: {rsaEncryption.PublicKeyString}");
             SharePublicKeyServerRpc(NetworkManager.Singleton.LocalClientId, rsaEncryption.PublicKeyString);
+            
+            // Demande toutes les clés existantes si on n'est pas le host
+            if (!NetworkManager.Singleton.IsHost)
+            {
+                RequestAllKeysServerRpc(NetworkManager.Singleton.LocalClientId);
+            }
         }
     }
 
@@ -113,8 +118,12 @@ public class NetworkChatManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     void SharePublicKeyServerRpc(ulong clientId, string publicKey)
     {
-        playerPublicKeys[clientId] = publicKey;
-        Debug.Log($"Clé publique reçue du joueur {clientId} : {publicKey}");
+        Debug.Log($"[Server] Clé reçue de {clientId}: {publicKey}");
+        
+        if (!playerPublicKeys.ContainsKey(clientId))
+        {
+            playerPublicKeys[clientId] = publicKey;
+        }
         
         // Broadcast à tous les clients
         UpdatePublicKeyClientRpc(clientId, publicKey);
@@ -142,11 +151,16 @@ public class NetworkChatManager : NetworkBehaviour
     // Méthode pour envoyer un message chiffré à un joueur spécifique
     public void SendEncryptedMessageToPlayer(ulong targetPlayerId, string message)
     {
-        Debug.Log($"Tentative d'envoi crypté à {targetPlayerId}. Clés disponibles: {string.Join(", ", playerPublicKeys.Keys)}");
+        Debug.Log($"[Client {NetworkManager.Singleton.LocalClientId}] Tentative envoi crypté à {targetPlayerId}");
+        Debug.Log($"Clés disponibles: {string.Join(", ", playerPublicKeys.Keys)}");
         
         if (!playerPublicKeys.ContainsKey(targetPlayerId))
         {
             Debug.LogWarning($"Clé publique du joueur {targetPlayerId} non trouvée");
+            if (chatManager != null)
+            {
+                chatManager.DisplaySystemMessage($"Erreur: Clé du joueur {targetPlayerId} manquante");
+            }
             return;
         }
         
@@ -179,6 +193,32 @@ public class NetworkChatManager : NetworkBehaviour
                 string displayName = localId == senderId ? senderName + " (à Joueur " + targetId + ")" : senderName + " (privé)";
                 chatManager.DisplayMessage(displayName, decryptedMessage, true);
             }
+        }
+    }
+   // Demande toutes les clés existantes au serveur
+    [Rpc(SendTo.Server)]
+    void RequestAllKeysServerRpc(ulong requestingClientId)
+    {
+        Debug.Log($"[Server] Client {requestingClientId} demande toutes les clés");
+        
+        // Envoie toutes les clés existantes au client qui demande
+        foreach (var kvp in playerPublicKeys)
+        {
+            SendSingleKeyClientRpc(kvp.Key, kvp.Value, requestingClientId);
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void SendSingleKeyClientRpc(ulong playerId, string publicKey, ulong targetClientId)
+    {
+        // Seul le client ciblé traite ce message
+        if (NetworkManager.Singleton.LocalClientId != targetClientId)
+            return;
+            
+        if (!playerPublicKeys.ContainsKey(playerId))
+        {
+            playerPublicKeys[playerId] = publicKey;
+            Debug.Log($"[Client {NetworkManager.Singleton.LocalClientId}] Clé du joueur {playerId} reçue : {publicKey}");
         }
     }
 }
