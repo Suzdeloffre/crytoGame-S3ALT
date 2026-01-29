@@ -24,6 +24,7 @@ public class ChatManager : MonoBehaviour
 
     private NetworkChatManager networkManager;
     private bool isChatOpen = false;
+    private GameObject localPlayer;
 
     void Start()
     {
@@ -50,8 +51,15 @@ public class ChatManager : MonoBehaviour
     {
         isChatOpen = !isChatOpen;
         chatPanel.SetActive(isChatOpen);
-
-        if (isChatOpen && textChatInput != null)
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("LocalPlayer"))
+        {
+            if (player.GetComponent<NetworkObject>().IsOwner)
+            {
+                player.GetComponent<PlayerController2D>().canMove = isChatOpen ? false : true;
+                break;
+            }
+        }
         {
             textChatInput.Select();
             textChatInput.ActivateInputField();
