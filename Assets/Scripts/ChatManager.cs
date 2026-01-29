@@ -108,7 +108,7 @@ public class ChatManager : MonoBehaviour
         TMP_Text messageText = newMessage.GetComponentInChildren<TMP_Text>();
         if (messageText != null)
         {
-            string encryptedTag = isEncrypted ? " 🔒" : "";
+            string encryptedTag = isEncrypted ? " -Crypted " : "";
             messageText.text = $"<b>{senderName}</b>: {message}{encryptedTag}";
         }
 
